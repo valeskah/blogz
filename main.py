@@ -139,13 +139,17 @@ def new_post():
 @app.route('/blog', methods=['GET'])
 def blog():
 
-    
     id = request.args.get('id')
-    blog_post = Blog_post.query.get(id)
-    user = User.query.filter_by(id=blog_post.owner_id).first()
-    return render_template('blog_page.html', blog_post=blog_post, user=user)
-    return redirect('/blog?id={0}'.format(id))
-
+    if id:
+        blog_post = Blog_post.query.get(id)
+        user = User.query.filter_by(id=blog_post.owner_id).first()
+        return render_template('blog_page.html', blog_post=blog_post, user=user)
+        return redirect('/blog?id={0}'.format(id))
+    else:
+        user = request.args.get('user')
+        user_id = User.query.filter_by(username=user).first()
+        user_blogs = Blog_post.query.filter_by(owner_id=user_id.id).all()
+        return render_template('singleUser.html', user_blogs=user_blogs, user=user)
 
 
 @app.route('/blogs', methods = ['POST', 'GET'])
