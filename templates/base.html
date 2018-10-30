@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <style>
+        h1 {
+            text-align: center;
+            }
+            
+        .error {
+            color: red;
+            font-style: italic;
+            }
+        
+            
+    </style>
+
+<nav>
+    <a href='/'>Home</a>
+    <a href='/blogs'>View Blogs</a>
+    <a href='/new_post'>Add a New Entry</a>
+    <a href='/login'>Log in</a>
+    <a href='/logout'>Log out</a>
+</nav>
+
+
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% for category,message in messages %}
+    <p class='{{category}}'>{{message}}</p>
+    {% endfor %}
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>
+

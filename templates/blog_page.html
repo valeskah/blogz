@@ -1,0 +1,11 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<head>
+    <h1>{{blog_post.blog_title}}</h1>
+    <h3>Written by: {{session.username}}
+</head>
+
+<p>{{blog_post.blog_body}}</p>
+
+{% endblock %}
