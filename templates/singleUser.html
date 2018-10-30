@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Blog Posts</h1>
+<body>
+    {% if posts|length == 0 %}
+    <p>No Blog Posts Yet</p>
+    
+    {% else %}
+    {% for post in posts %}
+    <h2><a href='/blog?id={{post.id}}' >{{post.blog_title}}</a></h2>
+    {{post.blog_body}}
+    <p class='writtenby' >Written by: {{username}}</p><
+    
+
+    {% endfor %}
+    {% endif %}
+
+{% endblock %}

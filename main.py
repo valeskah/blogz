@@ -12,7 +12,7 @@ class Blog_post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     blog_title = db.Column(db.String(120))
-    blog_body = db.Column(db.String(120))
+    blog_body = db.Column(db.String(1000))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, blog_title, blog_body, owner):
@@ -57,7 +57,7 @@ def login():
         if user and user.password == password:
             session['username'] = username
             flash('Logged in')
-            return render_template('new_post.html')
+            return redirect('/new_post')
 
     return render_template('login.html')
 
@@ -94,7 +94,8 @@ def signup():
                 db.session.add(new_user)
                 db.session.commit()
                 session['username'] = username
-                return render_template('new_post.html')
+                return redirect('/new_post')
+                owner = User(username, password)
 
     return render_template('signup.html')
 
@@ -103,39 +104,18 @@ def logout():
     del session['username']
     return redirect('/')
 
-
-
 @app.route('/new_post', methods=['POST', 'GET'])
 def new_post():
 
-    return render_template('new_post.html')
-    
-
-@app.route('/blogs', methods = ['POST', 'GET'])
-def blogs():
-
-    posts = Blog_post.query.all()
-    return render_template('blog_list.html', posts=posts)
-
-@app.route('/')
-def index():
-    owner = User.query.filter_by(username=session['username']).first()
-
-    users = User.query.all()
-    return render_template('index.html', users=users)
-
-@app.route('/blog', methods=['GET', 'POST'])
-def blog_page():
-
-    title_error = ''
-    body_error = ''
+    if request.method == 'GET':
+        return render_template('new_post.html')
 
     if request.method == 'POST':
+        title_error = ''
+        body_error = ''
         blog_title = request.form['blog_title']
         blog_body = request.form['blog_body']
-
-        
-        
+        owner = User.query.filter_by(username=session['username']).first()
         errors = 0
 
         if blog_title == '':
@@ -153,14 +133,35 @@ def blog_page():
             db.session.add(blog_post)
             db.session.commit()
             blog_id = blog_post.id
-
-            return redirect('/blog?id={0}'.format(blog_id))
-
-    else:
-        blog_id = request.args.get('id')
-        blog_post = Blog_post.query.get(blog_id)
         
-        return render_template('blog_page.html', blog_post=blog_post)
+            return redirect('/blog?id={0}'.format(blog_id))
+    
+@app.route('/blog', methods=['GET'])
+def blog():
+
+    
+    id = request.args.get('id')
+    blog_post = Blog_post.query.get(id)
+    user = User.query.filter_by(id=blog_post.owner_id).first()
+    return render_template('blog_page.html', blog_post=blog_post, user=user)
+    return redirect('/blog?id={0}'.format(id))
+
+
+
+@app.route('/blogs', methods = ['POST', 'GET'])
+def blogs():
+
+    posts = Blog_post.query.all()
+    return render_template('blog_list.html', posts=posts)
+
+@app.route('/')
+def index():
+
+    users = User.query.all()
+    return render_template('index.html', users=users)
+
+
+
 
 if __name__ == '__main__':
     app.run()
